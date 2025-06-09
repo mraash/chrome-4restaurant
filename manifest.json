@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Warehouse Request Helper",
+  "description": "Groups and sorts product request tables by predefined category order.",
+  "version": "0.1.1",
+  "permissions": ["contextMenus", "activeTab", "scripting"],
+  "host_permissions": ["*://*/*", "file://*/*"],
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dist/content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

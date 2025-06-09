@@ -1,0 +1,15 @@
+{
+  "name": "warehouse-menu-sorter",
+  "version": "0.1.1",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs --watch",
+    "build": "node esbuild.config.mjs --prod"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.269",
+    "@types/node": "^22.15.29",
+    "esbuild": "^0.22.0",
+    "typescript": "^5.5.0"
+  }
+}
