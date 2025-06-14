@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Warehouse Request Helper",
+  "name": "4Restaurant helper",
   "description": "Groups and sorts product request tables by predefined category order.",
   "version": "0.1.1",
   "permissions": ["contextMenus", "activeTab", "scripting"],

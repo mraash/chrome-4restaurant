@@ -1,12 +1,12 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'sort-by-category',
-    title: 'Sort',
+    title: 'Sort by category',
     contexts: ['page']
   });
   chrome.contextMenus.create({
     id: 'export-to-excel',
-    title: 'Экспортировать в Excel',
+    title: 'Export to excel',
     contexts: ['page']
   });
 });

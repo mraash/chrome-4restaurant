@@ -115,6 +115,7 @@ function render(
     tbody.replaceChildren();
     tbody.appendChild(headerRow); // keep original header at top
     grouped.forEach(([cat, rows]) => {
+        if (rows.length === 0) return; // Do not render categories without products
         const divider = document.createElement('tr');
         divider.className = 'group';
         const cell = document.createElement('td');
