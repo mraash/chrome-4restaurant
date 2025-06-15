@@ -18,4 +18,14 @@ chrome.runtime.onMessage.addListener(msg => {
             alert('Export error — see console for details.');
         }
     }
+    if (msg?.type === 'EXPORT_WRITE_OFF') {
+        import('../app/exportWriteOff').then(mod => {
+            try {
+                mod.exportWriteOff();
+            } catch (err) {
+                console.error(err);
+                alert('Write-off export error — see console for details.');
+            }
+        });
+    }
 });
