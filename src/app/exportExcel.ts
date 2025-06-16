@@ -261,6 +261,14 @@ export function exportFullPageToExcel(): void {
     // Add borders only to product table area
     if (tableStartRow !== -1 && tableEndRow !== -1) {
         addBorders(ws, tableStartRow, tableEndRow, headerColCount);
+        // Make header bold
+        for (let c = 0; c < headerColCount; c++) {
+            const addr = XLSX.utils.encode_cell({ r: tableStartRow, c });
+            const cell: any = (ws as any)[addr];
+            if (!cell) continue;
+            cell.s = cell.s || {};
+            cell.s.font = { ...(cell.s.font ?? {}), bold: true };
+        }
     }
     const wb = XLSX.utils.book_new();
     console.log(ws);
