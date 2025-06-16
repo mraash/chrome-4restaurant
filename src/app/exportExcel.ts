@@ -72,30 +72,33 @@ function collectLinesAfterTable(tbl: HTMLTableElement): string[] {
 
 export function exportFullPageToExcel(): void {
     const body = document.body;
-    const elements = Array.from(body.children);
+    const nodes = Array.from(body.childNodes);
     let beforeTable: string[] = [];
     let afterTable: string[] = [];
     let table: HTMLTableElement | null = null;
     let foundTable = false;
 
-    for (let i = 0; i < elements.length; i++) {
-        const el = elements[i];
-        if (el.tagName === 'TABLE' && !foundTable) {
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i] as HTMLElement | Text;
+        if (node instanceof HTMLElement && node.tagName === 'TABLE' && !foundTable) {
             // Look for a table whose header contains "Kods" and "Nosaukums"
-            const header = el.querySelector('tr');
+            const header = node.querySelector('tr');
             if (header) {
                 const texts = Array.from(header.cells).map(c => c.textContent?.trim().toLowerCase());
                 if (texts.includes('kods') && texts.includes('nosaukums')) {
-                    table = el as HTMLTableElement;
+                    table = node as HTMLTableElement;
                     foundTable = true;
                     continue;
                 }
             }
         }
         if (!foundTable) {
-            beforeTable.push(el.textContent?.trim() || '');
-            if (el.tagName === 'H2') {
-                beforeTable.push('');
+            if (node.nodeType === Node.TEXT_NODE) {
+                const txt = (node.textContent || '').trim();
+                if (txt) beforeTable.push(txt);
+            } else if (node instanceof HTMLElement) {
+                beforeTable.push(node.textContent?.trim() || '');
+                if (node.tagName === 'H2') beforeTable.push('');
             }
         }
     }
@@ -103,11 +106,19 @@ export function exportFullPageToExcel(): void {
     // Collect everything that appears in the document *after* the product table (footer, signatures, etc.)
     afterTable = table ? collectLinesAfterTable(table) : [];
 
-    beforeTable = collapseEmptyLines(beforeTable);
+    // Split possible multi-line strings (\n) into separate entries so date lines are preserved individually
+    const splitBefore: string[] = [];
+    beforeTable.forEach(str => {
+        str.split(/\n/).forEach(seg => splitBefore.push(seg.trim()));
+    });
+    beforeTable = collapseEmptyLines(splitBefore);
+
     afterTable = collapseEmptyLines(afterTable);
 
     // Build data array for Excel
     const ws_data: any[] = [];
+    let tableStartRow = -1; // index of header row in ws_data
+    let tableEndRow   = -1; // last row index of the product table (incl. category rows)
     beforeTable.forEach(line => { ws_data.push([line]); });
     if (beforeTable.length) ws_data.push([]); // one blank row between page headers and the table
     let headerColCount = 0;
@@ -119,6 +130,7 @@ export function exportFullPageToExcel(): void {
         const headerRow = table.querySelector('tr');
         if (headerRow) {
             const headerCells = Array.from(headerRow.cells).map(c => c.textContent?.trim() || '');
+            tableStartRow = ws_data.length; // mark header position
             ws_data.push(headerCells);
             headerColCount = headerCells.length;
         }
@@ -219,6 +231,7 @@ export function exportFullPageToExcel(): void {
                 ws_data.push(rowData);
             }
         });
+        tableEndRow = ws_data.length - 1; // last row after looping
     }
     if (afterTable.length) ws_data.push([]); // one blank row between the table and the footer
     afterTable.forEach(line => { ws_data.push([line]); });
@@ -245,8 +258,30 @@ export function exportFullPageToExcel(): void {
             }
         });
     }
+    // Add borders only to product table area
+    if (tableStartRow !== -1 && tableEndRow !== -1) {
+        addBorders(ws, tableStartRow, tableEndRow, headerColCount);
+    }
     const wb = XLSX.utils.book_new();
     console.log(ws);
     XLSX.utils.book_append_sheet(wb, ws, 'Report');
     XLSX.writeFile(wb, 'Report.xlsx');
-} 
+}
+
+const addBorders = (worksheet: XLSX.WorkSheet, rowStart: number, rowEnd: number, colCount: number) => {
+    const border = { style: 'thin', color: { rgb: '000000' } } as any;
+    for (let r = rowStart; r <= rowEnd; r++) {
+        for (let c = 0; c < colCount; c++) {
+            const addr = XLSX.utils.encode_cell({ r, c });
+            const cell = (worksheet as any)[addr];
+            if (!cell) continue;
+            cell.s = cell.s || {};
+            cell.s.border = {
+                top: border,
+                left: border,
+                right: border,
+                bottom: border,
+            };
+        }
+    }
+}; 
