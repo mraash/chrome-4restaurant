@@ -204,8 +204,7 @@ export const CATEGORIES: CategoryMap = {
         "Zirņi pelēkie",
         "Zirņi šķeltie",
         "Žāvētu augļu maisījums, rieksti, rozīnes",
-    ],
-    "Garšvielas": [
+        // Garšvielas
         "Citronskābe",
         "Etiķis galda 9%",
         "Garšviela universālā",
