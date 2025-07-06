@@ -111,7 +111,9 @@ export function exportFullPageToExcel(): void {
     beforeTable.forEach(str => {
         str.split(/\n/).forEach(seg => splitBefore.push(seg.trim()));
     });
-    beforeTable = collapseEmptyLines(splitBefore);
+    
+    // Remove empty strings from the beginning and end, but keep track of the original order
+    const cleanBefore = splitBefore.filter(line => line !== '');
 
     afterTable = collapseEmptyLines(afterTable);
     
@@ -125,8 +127,29 @@ export function exportFullPageToExcel(): void {
     const ws_data: any[] = [];
     let tableStartRow = -1; // index of header row in ws_data
     let tableEndRow   = -1; // last row index of the product table (incl. category rows)
-    beforeTable.forEach(line => { ws_data.push([line]); });
-    if (beforeTable.length) ws_data.push([]); // one blank row between page headers and the table
+    
+    // Format headers with specific spacing
+    if (cleanBefore.length >= 5) {
+        // First two headers without empty line between them
+        ws_data.push([cleanBefore[0]]); // SIA "Rīgas 2. slimnīca"
+        ws_data.push([cleanBefore[1]]); // Nodokļu maksātāja reģ. kods
+        ws_data.push([]); // Empty line after first two
+        
+        // Next three headers without empty lines between them
+        ws_data.push([cleanBefore[2]]); // Produktu pieprasījums noliktavai
+        ws_data.push([cleanBefore[3]]); // Datums
+        ws_data.push([cleanBefore[4]]); // Pakalpojuma saņēmējs
+        ws_data.push([]); // Empty line after these three
+        
+        // Add any remaining headers (if any)
+        for (let i = 5; i < cleanBefore.length; i++) {
+            ws_data.push([cleanBefore[i]]);
+        }
+    } else {
+        // Fallback to original logic if less than 5 headers
+        cleanBefore.forEach(line => { ws_data.push([line]); });
+        if (cleanBefore.length) ws_data.push([]); // one blank row between page headers and the table
+    }
     let headerColCount = 0;
     // Store merges for category rows
     const merges: any[] = [];
@@ -244,6 +267,18 @@ export function exportFullPageToExcel(): void {
 
     // Export to Excel
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    
+    // Apply bold formatting to H2 header (third header - "Produktu pieprasījums noliktavai...")
+    if (cleanBefore.length >= 3) {
+        const h2CellAddress = XLSX.utils.encode_cell({ r: 3, c: 0 }); // Fourth row (0-indexed: row 3)
+        const h2Cell = (ws as any)[h2CellAddress];
+        if (h2Cell) {
+            h2Cell.s = {
+                font: { bold: true }
+            };
+        }
+    }
+    
     if (merges.length) {
         (ws as any)['!merges'] = merges;
         // Center text in merged title cells
