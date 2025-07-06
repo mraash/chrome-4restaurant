@@ -114,6 +114,12 @@ export function exportFullPageToExcel(): void {
     beforeTable = collapseEmptyLines(splitBefore);
 
     afterTable = collapseEmptyLines(afterTable);
+    
+    // Replace specific text in afterTable
+    afterTable = afterTable.map(line => 
+        line.replace('Valdes priekšsēdētājs _______________ /_______________ /', 
+                    'Noliktavas pārzinis _______________ /_______________ /')
+    );
 
     // Build data array for Excel
     const ws_data: any[] = [];
