@@ -45,6 +45,31 @@ export function exportWriteOff(): void {
     XLSX.writeFile(wb, 'Write-off.xls', { bookType: 'xls' });
 }
 
+export function exportWriteOffNoQuantity(): void {
+    const tbl = findProductTable();
+    const headerCells = Array.from(tbl.querySelector('tr')!.cells);
+    const idxCode = headerCells.findIndex(c => normalize(c.textContent ?? '') === 'kods');
+    if (idxCode === -1) throw new Error('[WriteOff] Code column not found');
+
+    const data: any[][] = [];
+    // Header row required by target system: Tips | Kods | Svītrkods | Daudzums
+    data.push(['Tips', 'Kods', 'Svītrkods', 'Daudzums']);
+    const rows = tbl.querySelectorAll('tr');
+    rows.forEach((row, idx) => {
+        if (idx === 0) return; // skip header
+        if ((row as HTMLElement).classList.contains('group')) return; // skip category dividers
+        const cells = Array.from(row.cells);
+        const code = cells[idxCode]?.textContent?.trim() ?? '';
+        if (!code) return;
+        data.push(['', code, '', '']); // Leave quantity empty
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'WriteOff');
+    XLSX.writeFile(wb, 'Write-off-products.xls', { bookType: 'xls' });
+}
+
 function normalize(str: string): string {
     return str.toLowerCase().replace(/\s+/g, ' ').trim();
 } 

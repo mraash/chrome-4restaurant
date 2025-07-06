@@ -28,4 +28,14 @@ chrome.runtime.onMessage.addListener(msg => {
             }
         });
     }
+    if (msg?.type === 'EXPORT_WRITE_OFF_NO_QUANTITY') {
+        import('../app/exportWriteOff').then(mod => {
+            try {
+                mod.exportWriteOffNoQuantity();
+            } catch (err) {
+                console.error(err);
+                alert('Write-off export (no quantity) error — see console for details.');
+            }
+        });
+    }
 });

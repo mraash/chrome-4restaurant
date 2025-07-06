@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "4Restaurant helper",
-  "description": "Groups and sorts product request tables by predefined category order.",
+  "name": "4Restaurant palīgs",
+  "description": "Grupē un sakārto 4Restaurant produktu pieprasījumu tabulas pēc noteiktās kategorijas secības.",
   "version": "0.1.1",
   "permissions": ["contextMenus", "activeTab", "scripting"],
   "host_permissions": ["*://*/*", "file://*/*"],
