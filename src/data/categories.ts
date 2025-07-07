@@ -44,7 +44,6 @@ export const CATEGORIES: CategoryMap = {
         "Salāti Lollo Rosso",
         "Salāti ledus (iceberg)",
         "Šampinjoni svaigi",
-        "Sarkanās paprikas pulveris",
         "Selerijas sakne",
         "Seleriju kāti",
         "Sīpoli",
@@ -73,16 +72,11 @@ export const CATEGORIES: CategoryMap = {
         "Svagais siers bez piedevām",
         "Sviests",
     ],
-    "Olas": [
-        "Olas",
-    ],
     "Maize": [
         "Baltmaize",
         "Kliju maize",
         "Maize rudzu ar graudiem",
-        "Rīvmaize",
         "Rudzu maize",
-        "Rudzu rīvmaize",
         "Saldskābā maize",
     ],
     "Gaļa & zivs": [
@@ -217,9 +211,15 @@ export const CATEGORIES: CategoryMap = {
         "Pipari melnie malti",
         "Piparmētras",
         "Sinepes Angļu",
+        "Sarkanās paprikas pulveris",
         "Sāls",
         "Vaniļas cukurs",
         "Želatīns",
+        // Olas
+        "Olas",
+        // Rīvmaize
+        "Rīvmaize",
+        "Rudzu rīvmaize",
     ],
     "Citi": [
         "Ūdens",
