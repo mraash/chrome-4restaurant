@@ -177,6 +177,14 @@ export function exportFullPageToExcel(): void {
         const idxDinner    = colIndex('vakariņas');
         const mealIdxs = [idxBreakfast, idxLunch, idxSnack, idxDinner].filter(i => i !== -1);
 
+        // Helper to parse numeric value (supports commas, units etc.)
+        const parseNum = (str: string | any): number => {
+            if (typeof str !== 'string') return 0;
+            const cleaned = str.replace(/[^0-9.,-]/g, '').replace(',', '.');
+            const val = parseFloat(cleaned);
+            return isFinite(val) ? val : 0;
+        };
+
         // Add table rows (including category divider rows with merge and formulas for meal columns)
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, idx) => {
@@ -198,18 +206,27 @@ export function exportFullPageToExcel(): void {
                 for (let ci = 0; ci < headerColCount; ci++) {
                     const cellEl = row.cells[ci] as HTMLTableCellElement | undefined;
                     if (cellEl) {
-                        rowData[ci] = cellEl.textContent?.trim() || '';
+                        const cellText = cellEl.textContent?.trim() || '';
+                        
+                        // Set numeric type for "Kopā" column
+                        if (ci === idxTotal && cellText) {
+                            const numVal = parseNum(cellText);
+                            if (numVal !== 0 || cellText === '0') {
+                                rowData[ci] = { t: 'n', v: numVal };
+                            } else {
+                                rowData[ci] = cellText;
+                            }
+                        } else {
+                            rowData[ci] = cellText;
+                        }
                     }
                 }
 
-                // Helper to parse numeric value (supports commas, units etc.)
-                const parseNum = (str: string): number => {
-                    const cleaned = str.replace(/[^0-9.,-]/g, '').replace(',', '.');
-                    const val = parseFloat(cleaned);
-                    return isFinite(val) ? val : 0;
-                };
-
-                const totalVal = idxTotal !== -1 ? parseNum(rowData[idxTotal]) : 0;
+                const totalVal = idxTotal !== -1 ? (
+                    typeof rowData[idxTotal] === 'object' && rowData[idxTotal]?.v !== undefined ? 
+                    rowData[idxTotal].v : 
+                    parseNum(rowData[idxTotal])
+                ) : 0;
 
                 const colLetter = (idx: number): string => {
                     let n = idx;
@@ -225,7 +242,10 @@ export function exportFullPageToExcel(): void {
 
                 if (totalVal > 0 && idxTotal !== -1 && mealIdxs.length) {
                     const totalColL = colLetter(idxTotal);
-                    const mealVals: number[] = mealIdxs.map(mi => parseNum(rowData[mi]));
+                    const mealVals: number[] = mealIdxs.map(mi => {
+                        const val = rowData[mi];
+                        return typeof val === 'object' && val?.v !== undefined ? val.v : parseNum(val);
+                    });
                     const fractions: number[] = mealVals.map(v => v / totalVal);
 
                     // Determine which meal column should absorb the rounding remainder: last non-zero
@@ -310,6 +330,8 @@ export function exportFullPageToExcel(): void {
             cell.s = cell.s || {};
             cell.s.font = { ...(cell.s.font ?? {}), bold: true };
         }
+        
+
     }
     const wb = XLSX.utils.book_new();
     console.log(ws);
