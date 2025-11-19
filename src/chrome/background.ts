@@ -1,22 +1,22 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'sort-by-category',
-    title: 'Apstrādāt produktu pieprasījumu',
+    title: 'Apstr\u0101d\u0101t produktu piepras\u012bjumu',
     contexts: ['page']
   });
   chrome.contextMenus.create({
     id: 'export-to-excel',
-    title: 'Eksportēt uz Excel',
+    title: 'Eksport\u0113t uz Excel',
     contexts: ['page']
   });
   chrome.contextMenus.create({
     id: 'export-write-off',
-    title: 'Exportēt uz Horizon failu (produkti + daudzums)',
+    title: 'Eksport\u0113t uz Horizon failu (produkti + daudzums)',
     contexts: ['page']
   });
   chrome.contextMenus.create({
     id: 'export-write-off-no-quantity',
-    title: 'Exportēt uz Horizon failu (produkti)',
+    title: 'Eksport\u0113t uz Horizon failu (produkti)',
     contexts: ['page']
   });
 });
