@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx-js-style';
+import { applySignatureReplacementsToLines } from './signatures';
 
 function collapseEmptyLines(arr: string[]): string[] {
     const result: string[] = [];
@@ -117,11 +118,8 @@ export function exportFullPageToExcel(): void {
 
     afterTable = collapseEmptyLines(afterTable);
     
-    // Replace specific text in afterTable
-    afterTable = afterTable.map(line => 
-        line.replace('Valdes priekšsēdētājs _______________ /_______________ /', 
-                    'Noliktavas pārzinis _______________ /_______________ /')
-    );
+    // Replace specific text in afterTable to keep DOM and Excel export aligned
+    afterTable = applySignatureReplacementsToLines(afterTable);
 
     // Build data array for Excel
     const ws_data: any[] = [];

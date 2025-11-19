@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'sort-by-category',
-    title: 'Kategorizēt pieprasījumu tabulu',
+    title: 'Apstrādāt produktu pieprasījumu',
     contexts: ['page']
   });
   chrome.contextMenus.create({

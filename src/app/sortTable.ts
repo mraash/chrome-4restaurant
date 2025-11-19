@@ -1,4 +1,5 @@
 import { CATEGORIES } from '../data/categories';
+import { updateSignatureLabelsAfterTable } from './signatures';
 
 interface ProductRow {
     element: HTMLTableRowElement;
@@ -16,6 +17,7 @@ export function sortTable(): void {
     clearPreviousGroups(table);
     const grouped  = groupRows(rows, CATEGORIES);
     render(table, headerTr, grouped);
+    updateSignatureLabelsAfterTable(table);
 }
 
 function normalize(str: string): string {
