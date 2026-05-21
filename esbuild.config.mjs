@@ -5,7 +5,7 @@ const prod  = args.includes('--prod');
 const watch = args.includes('--watch');
 
 const base = {
-  entryPoints: ['src/chrome/background.ts', 'src/chrome/content.ts'],
+  entryPoints: ['src/chrome/background.ts', 'src/chrome/content.ts', 'src/chrome/options.ts'],
   bundle: true,
   format: 'esm',
   target: 'chrome118',

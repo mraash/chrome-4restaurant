@@ -71,7 +71,13 @@ function collectLinesAfterTable(tbl: HTMLTableElement): string[] {
     return lines;
 }
 
-export function exportFullPageToExcel(): void {
+export async function exportFullPageToExcel(): Promise<void> {
+    const storageData = await chrome.storage.local.get('exportSettings');
+    const settings = storageData.exportSettings || {
+        totalColumn: 'kopā',
+        mealColumns: ['brokastis', 'pusdienas', 'launags', 'vakariņas']
+    };
+
     const body = document.body;
     const nodes = Array.from(body.childNodes);
     let beforeTable: string[] = [];
@@ -168,12 +174,10 @@ export function exportFullPageToExcel(): void {
             const txt = normalizeHeader(cell.textContent ?? '');
             return txt === needle || txt.includes(needle); // allow prefixes like "1. brokastis"
         }) : -1;
-        const idxTotal  = colIndex('kopā');
-        const idxBreakfast = colIndex('brokastis');
-        const idxLunch     = colIndex('pusdienas');
-        const idxSnack     = colIndex('launags');
-        const idxDinner    = colIndex('vakariņas');
-        const mealIdxs = [idxBreakfast, idxLunch, idxSnack, idxDinner].filter(i => i !== -1);
+        const idxTotal  = colIndex(settings.totalColumn.toLowerCase());
+        const mealIdxs = settings.mealColumns
+            .map((col: string) => colIndex(col.toLowerCase()))
+            .filter((i: number) => i !== -1);
 
         // Helper to parse numeric value (supports commas, units etc.)
         const parseNum = (str: string | any): number => {

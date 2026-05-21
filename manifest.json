@@ -3,11 +3,15 @@
   "name": "4Restaurant palīgs",
   "description": "Grupē un sakārto 4Restaurant produktu pieprasījumu tabulas pēc noteiktās kategorijas secības.",
   "version": "0.1.1",
-  "permissions": ["contextMenus", "activeTab", "scripting"],
+  "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
   "host_permissions": ["*://*/*", "file://*/*"],
   "background": {
     "service_worker": "dist/background.js",
     "type": "module"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   },
   "content_scripts": [
     {

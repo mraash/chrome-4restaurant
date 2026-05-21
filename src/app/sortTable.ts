@@ -10,12 +10,17 @@ interface ProductRow {
 type CategoryRule = string | [string, string];
 type CategoryMap = Record<string, CategoryRule[]>;
 
-export function sortTable(): void {
+export async function sortTable(): Promise<void> {
     const table    = findProductTable();
     const headerTr = getHeaderRow(table);
     const rows     = extractRows(table, headerTr);
     clearPreviousGroups(table);
-    const grouped  = groupRows(rows, CATEGORIES);
+    
+    const data = await chrome.storage.local.get(['customCategories', 'categoryOrder']);
+    const categoriesToUse = data.customCategories || CATEGORIES;
+    const orderToUse = data.categoryOrder || Object.keys(categoriesToUse);
+    
+    const grouped  = groupRows(rows, categoriesToUse, orderToUse);
     render(table, headerTr, grouped);
     updateSignatureLabelsAfterTable(table);
 }
@@ -74,9 +79,14 @@ function clearPreviousGroups(table: HTMLTableElement): void {
     table.querySelectorAll('tr.group').forEach(el => el.remove());
 }
 
-function groupRows(rows: ProductRow[], categories: CategoryMap): [string, ProductRow[]][] {
+function groupRows(rows: ProductRow[], categories: CategoryMap, order: string[]): [string, ProductRow[]][] {
     const result: [string, ProductRow[]][] = [];
-    for (const [catName, rules] of Object.entries(categories)) {
+    
+    // We iterate over the explicitly saved order
+    for (const catName of order) {
+        const rules = categories[catName];
+        if (!rules) continue; // safety check
+        
         const matched: ProductRow[] = [];
         rows = rows.filter(r => {
             const hit = matchesCategory(r, rules);
