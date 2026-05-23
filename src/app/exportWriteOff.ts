@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx-js-style';
+import { appendExtension, normalizeFileNameSettings } from './fileNames';
 
 function findProductTable(): HTMLTableElement {
     const tables = Array.from(document.querySelectorAll<HTMLTableElement>('table'));
@@ -17,7 +18,9 @@ function parseNum(str: string): number {
     return isFinite(val) ? val : 0;
 }
 
-export function exportWriteOff(): void {
+export async function exportWriteOff(): Promise<void> {
+    const { fileNameSettings } = await chrome.storage.local.get('fileNameSettings');
+    const configuredFileName = appendExtension(normalizeFileNameSettings(fileNameSettings).horizonWriteOff, '.xls');
     const tbl = findProductTable();
     const headerCells = Array.from(tbl.querySelector('tr')!.cells);
     const idxCode = headerCells.findIndex(c => normalize(c.textContent ?? '') === 'kods');
@@ -42,10 +45,12 @@ export function exportWriteOff(): void {
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'WriteOff');
-    XLSX.writeFile(wb, 'Write-off.xls', { bookType: 'xls' });
+    XLSX.writeFile(wb, configuredFileName, { bookType: 'xls' });
 }
 
-export function exportWriteOffNoQuantity(): void {
+export async function exportWriteOffNoQuantity(): Promise<void> {
+    const { fileNameSettings } = await chrome.storage.local.get('fileNameSettings');
+    const configuredFileName = appendExtension(normalizeFileNameSettings(fileNameSettings).horizonWriteOff, '.xls');
     const tbl = findProductTable();
     const headerCells = Array.from(tbl.querySelector('tr')!.cells);
     const idxCode = headerCells.findIndex(c => normalize(c.textContent ?? '') === 'kods');
@@ -67,7 +72,7 @@ export function exportWriteOffNoQuantity(): void {
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'WriteOff');
-    XLSX.writeFile(wb, 'Write-off-products.xls', { bookType: 'xls' });
+    XLSX.writeFile(wb, configuredFileName, { bookType: 'xls' });
 }
 
 function normalize(str: string): string {

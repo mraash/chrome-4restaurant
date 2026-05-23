@@ -1,5 +1,6 @@
-import type { CategoryMap, ExportSettings } from '../types/data';
+import type { CategoryMap, ExportSettings, FileNameSettings } from '../types/data';
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../data/categories';
+import { DEFAULT_FILE_NAME_SETTINGS, normalizeFileNameSettings } from '../app/fileNames';
 
 const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
     totalColumn: '',
@@ -15,6 +16,7 @@ let currentExportSettings: ExportSettings = {
     ...DEFAULT_EXPORT_SETTINGS,
     mealColumns: [...DEFAULT_EXPORT_SETTINGS.mealColumns]
 };
+let currentFileNameSettings: FileNameSettings = { ...DEFAULT_FILE_NAME_SETTINGS };
 let categoryOrder: string[] = [];
 let activeCategoryName: string | null = null;
 let draggedCategoryName: string | null = null;
@@ -40,8 +42,10 @@ function normalizeExportSettings(settings: Partial<ExportSettings> | undefined):
 // Navigation
 const navCategoriesBtn = document.getElementById('nav-categories') as HTMLButtonElement;
 const navExportColsBtn = document.getElementById('nav-export-cols') as HTMLButtonElement;
+const navFileNamesBtn = document.getElementById('nav-file-names') as HTMLButtonElement;
 const tabCategories = document.getElementById('tab-categories') as HTMLElement;
 const tabExportCols = document.getElementById('tab-export-cols') as HTMLElement;
+const tabFileNames = document.getElementById('tab-file-names') as HTMLElement;
 
 // Categories Tab Elements
 const importBtn = document.getElementById('import-btn') as HTMLButtonElement;
@@ -67,10 +71,15 @@ const newMealColInput = document.getElementById('new-meal-col-input') as HTMLInp
 const addMealColBtn = document.getElementById('add-meal-col-btn') as HTMLButtonElement;
 const mealColList = document.getElementById('meal-col-list') as HTMLUListElement;
 
+// File Names Tab Elements
+const saveFileNamesBtn = document.getElementById('save-file-names-btn') as HTMLButtonElement;
+const excelFilenameInput = document.getElementById('excel-filename-input') as HTMLInputElement;
+const horizonFilenameInput = document.getElementById('horizon-filename-input') as HTMLInputElement;
+
 const statusMessage = document.getElementById('status-message') as HTMLDivElement;
 
 async function init() {
-    const data = await chrome.storage.local.get(['customCategories', 'exportSettings', 'categoryOrder']);
+    const data = await chrome.storage.local.get(['customCategories', 'exportSettings', 'categoryOrder', 'fileNameSettings']);
     if (data.customCategories) {
         currentCategories = data.customCategories;
     } else {
@@ -86,26 +95,30 @@ async function init() {
     if (data.exportSettings) {
         currentExportSettings = normalizeExportSettings(data.exportSettings);
     }
+
+    if (data.fileNameSettings) {
+        currentFileNameSettings = normalizeFileNameSettings(data.fileNameSettings);
+    }
     
     renderCategories();
     renderExportSettings();
+    renderFileNameSettings();
     setupEventListeners();
 }
 
 // --- Navigation ---
-function switchTab(tabId: 'categories' | 'export') {
-    if (tabId === 'categories') {
-        navCategoriesBtn.classList.add('active');
-        navExportColsBtn.classList.remove('active');
-        tabCategories.style.display = '';
-        tabExportCols.style.display = 'none';
-    } else {
-        navExportColsBtn.classList.add('active');
-        navCategoriesBtn.classList.remove('active');
-        tabExportCols.style.display = '';
-        tabCategories.style.display = 'none';
-        // Auto save active category when leaving the tab
-        saveCurrentCategoryName();
+function switchTab(tabId: 'categories' | 'export' | 'files') {
+    navCategoriesBtn.classList.toggle('active', tabId === 'categories');
+    navExportColsBtn.classList.toggle('active', tabId === 'export');
+    navFileNamesBtn.classList.toggle('active', tabId === 'files');
+    tabCategories.style.display = tabId === 'categories' ? '' : 'none';
+    tabExportCols.style.display = tabId === 'export' ? '' : 'none';
+    tabFileNames.style.display = tabId === 'files' ? '' : 'none';
+
+    saveCurrentCategoryName();
+    syncExportSettingsInputs();
+    syncFileNameSettingsInputs();
+    if (tabId !== 'categories') {
         renderCategories();
     }
 }
@@ -281,12 +294,27 @@ function syncExportSettingsInputs() {
     currentExportSettings.totalColumn = totalColInput.value.trim();
 }
 
+// --- File Names Logic ---
+function renderFileNameSettings() {
+    excelFilenameInput.value = currentFileNameSettings.excelRequest;
+    horizonFilenameInput.value = currentFileNameSettings.horizonWriteOff;
+}
+
+function syncFileNameSettingsInputs() {
+    currentFileNameSettings = normalizeFileNameSettings({
+        excelRequest: excelFilenameInput.value,
+        horizonWriteOff: horizonFilenameInput.value
+    });
+}
+
 async function saveAllToStorage() {
     saveCurrentCategoryName();
     syncExportSettingsInputs();
+    syncFileNameSettingsInputs();
     await chrome.storage.local.set({ 
         customCategories: currentCategories,
         exportSettings: currentExportSettings,
+        fileNameSettings: currentFileNameSettings,
         categoryOrder: categoryOrder
     });
     showStatus('Iestatījumi veiksmīgi saglabāti!', 'success');
@@ -297,6 +325,7 @@ function setupEventListeners() {
     // Navigation
     navCategoriesBtn.addEventListener('click', () => switchTab('categories'));
     navExportColsBtn.addEventListener('click', () => switchTab('export'));
+    navFileNamesBtn.addEventListener('click', () => switchTab('files'));
 
     // Categories
     addCategoryBtn.addEventListener('click', () => {
@@ -346,9 +375,12 @@ function setupEventListeners() {
     
     saveCategoriesBtn.addEventListener('click', saveAllToStorage);
     saveExportColsBtn.addEventListener('click', saveAllToStorage);
+    saveFileNamesBtn.addEventListener('click', saveAllToStorage);
     
     // Export Settings
     totalColInput.addEventListener('change', syncExportSettingsInputs);
+    excelFilenameInput.addEventListener('change', syncFileNameSettingsInputs);
+    horizonFilenameInput.addEventListener('change', syncFileNameSettingsInputs);
     
     addMealColBtn.addEventListener('click', () => {
         const val = newMealColInput.value.trim();
@@ -368,10 +400,12 @@ function setupEventListeners() {
     exportBtn.addEventListener('click', () => {
         saveCurrentCategoryName();
         syncExportSettingsInputs();
+        syncFileNameSettingsInputs();
         
         const dataStr = JSON.stringify({
             categories: currentCategories,
             exportSettings: currentExportSettings,
+            fileNameSettings: currentFileNameSettings,
             categoryOrder: categoryOrder
         }, null, 2);
         
@@ -395,9 +429,10 @@ function setupEventListeners() {
             try {
                 const parsed = JSON.parse(ev.target?.result as string);
                 
-                if (parsed.categories || parsed.exportSettings || parsed.categoryOrder) {
+                if (parsed.categories || parsed.exportSettings || parsed.fileNameSettings || parsed.categoryOrder) {
                     if (parsed.categories) currentCategories = parsed.categories;
                     if (parsed.exportSettings) currentExportSettings = normalizeExportSettings(parsed.exportSettings);
+                    if (parsed.fileNameSettings) currentFileNameSettings = normalizeFileNameSettings(parsed.fileNameSettings);
                     if (parsed.categoryOrder) {
                         categoryOrder = parsed.categoryOrder;
                     } else {
@@ -412,6 +447,7 @@ function setupEventListeners() {
                 activeCategoryName = null;
                 renderCategories();
                 renderExportSettings();
+                renderFileNameSettings();
                 showStatus('Iestatījumi veiksmīgi importēti! Neaizmirstiet saglabāt.', 'success');
             } catch (err) {
                 showStatus('Kļūda importējot failu: nederīgs formāts.', 'error');

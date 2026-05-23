@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx-js-style';
 import { applySignatureReplacementsToLines } from './signatures';
+import { appendExtension, normalizeFileNameSettings } from './fileNames';
 import type { ExportSettings } from '../types/data';
 
 const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
@@ -100,8 +101,9 @@ function collectLinesAfterTable(tbl: HTMLTableElement): string[] {
 }
 
 export async function exportFullPageToExcel(): Promise<void> {
-    const storageData = await chrome.storage.local.get('exportSettings');
+    const storageData = await chrome.storage.local.get(['exportSettings', 'fileNameSettings']);
     const settings = normalizeExportSettings(storageData.exportSettings);
+    const fileNameSettings = normalizeFileNameSettings(storageData.fileNameSettings);
 
     const body = document.body;
     const nodes = Array.from(body.childNodes);
@@ -383,7 +385,7 @@ export async function exportFullPageToExcel(): Promise<void> {
     const wb = XLSX.utils.book_new();
     console.log(ws);
     XLSX.utils.book_append_sheet(wb, ws, 'Report');
-    XLSX.writeFile(wb, 'Report.xlsx');
+    XLSX.writeFile(wb, appendExtension(fileNameSettings.excelRequest, '.xlsx'));
 }
 
 const addBorders = (worksheet: XLSX.WorkSheet, rowStart: number, rowEnd: number, colCount: number) => {

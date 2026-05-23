@@ -18,6 +18,7 @@
             <nav class="app-nav">
                 <button id="nav-categories" class="nav-btn active">Kategorijas</button>
                 <button id="nav-export-cols" class="nav-btn">Dinamiskās Kolonnas</button>
+                <button id="nav-file-names" class="nav-btn">Failu Nosaukumi</button>
             </nav>
         </header>
         
@@ -118,6 +119,40 @@
                         </div>
                         
                         <ul id="meal-col-list" class="item-list compact"></ul>
+                    </div>
+                </div>
+            </section>
+            <!-- TAB: FAILU NOSAUKUMI -->
+            <section id="tab-file-names" class="tab-content" style="display: none;">
+                <div class="tab-header">
+                    <div class="tab-title">
+                        <h2>Lejupielāžu Failu Nosaukumi</h2>
+                        <p class="subtitle">Norādiet noklusētos failu nosaukumus Excel pieprasījumam un Horizon norakstīšanas eksportam.</p>
+                    </div>
+                    <div class="tab-actions">
+                        <button id="save-file-names-btn" class="btn btn-primary">Saglabāt</button>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="form-group">
+                        <label for="excel-filename-input" class="label">Excel pieprasījuma faila nosaukums</label>
+                        <p class="help-text">Nosaukums failam, kas tiek lejupielādēts no komandas "Eksportēt uz Excel".</p>
+                        <div class="filename-input">
+                            <input type="text" id="excel-filename-input" class="input filename-base-input" placeholder="Report">
+                            <span class="filename-extension">.xlsx</span>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label for="horizon-filename-input" class="label">Horizon norakstīšanas faila nosaukums</label>
+                        <p class="help-text">Nosaukums Horizon XLS failam. Abi Horizon eksporta varianti izmanto vienu un to pašu nosaukumu.</p>
+                        <div class="filename-input">
+                            <input type="text" id="horizon-filename-input" class="input filename-base-input" placeholder="Write-off">
+                            <span class="filename-extension">.xls</span>
+                        </div>
                     </div>
                 </div>
             </section>

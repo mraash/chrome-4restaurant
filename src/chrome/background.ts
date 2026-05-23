@@ -21,17 +21,40 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+const CONTENT_SCRIPT_VERSION = 'file-name-settings-v1';
+
+async function ensureContentScript(tabId: number) {
+  try {
+    const response = await chrome.tabs.sendMessage(tabId, { type: 'PING_CONTENT_SCRIPT_V2' });
+    if (response?.version === CONTENT_SCRIPT_VERSION) return;
+  } catch {
+    // No compatible content script is active in this tab yet.
+  }
+
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ['content.js']
+  });
+}
+
+async function sendCommand(tabId: number, type: string) {
+  await ensureContentScript(tabId);
+  await chrome.tabs.sendMessage(tabId, { type });
+}
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'sort-by-category' && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'SORT_BY_CATEGORY' });
+  if (!tab?.id) return;
+
+  if (info.menuItemId === 'sort-by-category') {
+    sendCommand(tab.id, 'SORT_BY_CATEGORY_V2').catch(console.error);
   }
-  if (info.menuItemId === 'export-to-excel' && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'EXPORT_TO_EXCEL' });
+  if (info.menuItemId === 'export-to-excel') {
+    sendCommand(tab.id, 'EXPORT_TO_EXCEL_V2').catch(console.error);
   }
-  if (info.menuItemId === 'export-write-off' && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'EXPORT_WRITE_OFF' });
+  if (info.menuItemId === 'export-write-off') {
+    sendCommand(tab.id, 'EXPORT_WRITE_OFF_V2').catch(console.error);
   }
-  if (info.menuItemId === 'export-write-off-no-quantity' && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'EXPORT_WRITE_OFF_NO_QUANTITY' });
+  if (info.menuItemId === 'export-write-off-no-quantity') {
+    sendCommand(tab.id, 'EXPORT_WRITE_OFF_NO_QUANTITY_V2').catch(console.error);
   }
 });
