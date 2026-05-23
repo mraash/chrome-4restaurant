@@ -2,15 +2,40 @@ import type { CategoryMap, ExportSettings } from '../types/data';
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../data/categories';
 
 const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
-    totalColumn: 'kopā',
-    mealColumns: ['brokastis', 'pusdienas', 'launags', 'vakariņas']
+    totalColumn: '',
+    mealColumns: []
 };
+const DEFAULT_MEAL_COLUMNS_TO_CLEAR = [
+    ['brokastis', 'pusdienas', 'launags', 'vakariņas'],
+    ['brokastis', 'pusdienas', 'vakariņas', 'otrās vakariņas']
+];
 
 let currentCategories: CategoryMap = {};
-let currentExportSettings: ExportSettings = { ...DEFAULT_EXPORT_SETTINGS };
+let currentExportSettings: ExportSettings = {
+    ...DEFAULT_EXPORT_SETTINGS,
+    mealColumns: [...DEFAULT_EXPORT_SETTINGS.mealColumns]
+};
 let categoryOrder: string[] = [];
 let activeCategoryName: string | null = null;
 let draggedCategoryName: string | null = null;
+
+function isDefaultMealColumns(mealColumns: string[]): boolean {
+    return DEFAULT_MEAL_COLUMNS_TO_CLEAR.some(defaultColumns =>
+        mealColumns.length === defaultColumns.length
+            && mealColumns.every((col, index) => col === defaultColumns[index])
+    );
+}
+
+function normalizeExportSettings(settings: Partial<ExportSettings> | undefined): ExportSettings {
+    const totalColumn = settings?.totalColumn || '';
+    const mealColumns = Array.isArray(settings?.mealColumns) ? settings.mealColumns : [];
+    const shouldClearDefaults = totalColumn === 'kopā' && isDefaultMealColumns(mealColumns);
+
+    return {
+        totalColumn: shouldClearDefaults ? DEFAULT_EXPORT_SETTINGS.totalColumn : totalColumn,
+        mealColumns: shouldClearDefaults ? [...DEFAULT_EXPORT_SETTINGS.mealColumns] : mealColumns
+    };
+}
 
 // Navigation
 const navCategoriesBtn = document.getElementById('nav-categories') as HTMLButtonElement;
@@ -59,7 +84,7 @@ async function init() {
     }
     
     if (data.exportSettings) {
-        currentExportSettings = data.exportSettings;
+        currentExportSettings = normalizeExportSettings(data.exportSettings);
     }
     
     renderCategories();
@@ -372,7 +397,7 @@ function setupEventListeners() {
                 
                 if (parsed.categories || parsed.exportSettings || parsed.categoryOrder) {
                     if (parsed.categories) currentCategories = parsed.categories;
-                    if (parsed.exportSettings) currentExportSettings = parsed.exportSettings;
+                    if (parsed.exportSettings) currentExportSettings = normalizeExportSettings(parsed.exportSettings);
                     if (parsed.categoryOrder) {
                         categoryOrder = parsed.categoryOrder;
                     } else {

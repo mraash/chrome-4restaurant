@@ -1,5 +1,33 @@
 import * as XLSX from 'xlsx-js-style';
 import { applySignatureReplacementsToLines } from './signatures';
+import type { ExportSettings } from '../types/data';
+
+const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
+    totalColumn: '',
+    mealColumns: []
+};
+const DEFAULT_MEAL_COLUMNS_TO_CLEAR = [
+    ['brokastis', 'pusdienas', 'launags', 'vakariņas'],
+    ['brokastis', 'pusdienas', 'vakariņas', 'otrās vakariņas']
+];
+
+function isDefaultMealColumns(mealColumns: string[]): boolean {
+    return DEFAULT_MEAL_COLUMNS_TO_CLEAR.some(defaultColumns =>
+        mealColumns.length === defaultColumns.length
+            && mealColumns.every((col, index) => col === defaultColumns[index])
+    );
+}
+
+function normalizeExportSettings(settings: Partial<ExportSettings> | undefined): ExportSettings {
+    const totalColumn = settings?.totalColumn || '';
+    const mealColumns = Array.isArray(settings?.mealColumns) ? settings.mealColumns : [];
+    const shouldClearDefaults = totalColumn === 'kopā' && isDefaultMealColumns(mealColumns);
+
+    return {
+        totalColumn: shouldClearDefaults ? DEFAULT_EXPORT_SETTINGS.totalColumn : totalColumn,
+        mealColumns: shouldClearDefaults ? [...DEFAULT_EXPORT_SETTINGS.mealColumns] : mealColumns
+    };
+}
 
 function collapseEmptyLines(arr: string[]): string[] {
     const result: string[] = [];
@@ -73,10 +101,7 @@ function collectLinesAfterTable(tbl: HTMLTableElement): string[] {
 
 export async function exportFullPageToExcel(): Promise<void> {
     const storageData = await chrome.storage.local.get('exportSettings');
-    const settings = storageData.exportSettings || {
-        totalColumn: 'kopā',
-        mealColumns: ['brokastis', 'pusdienas', 'launags', 'vakariņas']
-    };
+    const settings = normalizeExportSettings(storageData.exportSettings);
 
     const body = document.body;
     const nodes = Array.from(body.childNodes);
@@ -169,15 +194,35 @@ export async function exportFullPageToExcel(): Promise<void> {
         }
 
         // Pre-compute column indexes
-        const normalizeHeader = (s: string): string => s.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-        const colIndex = (needle: string) => headerRow ? Array.from(headerRow.cells).findIndex(cell => {
-            const txt = normalizeHeader(cell.textContent ?? '');
-            return txt === needle || txt.includes(needle); // allow prefixes like "1. brokastis"
-        }) : -1;
-        const idxTotal  = colIndex(settings.totalColumn.toLowerCase());
-        const mealIdxs = settings.mealColumns
-            .map((col: string) => colIndex(col.toLowerCase()))
-            .filter((i: number) => i !== -1);
+        const normalizeHeader = (s: string): string =>
+            s.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+        const stripHeaderPrefix = (s: string): string => normalizeHeader(s).replace(/^\d+\.\s*/, '');
+        const headerCells = headerRow ? Array.from(headerRow.cells) : [];
+        const colIndex = (needleRaw: string): number => {
+            const needle = stripHeaderPrefix(needleRaw);
+            if (!needle) return -1;
+
+            return headerCells.findIndex(cell => {
+                const txt = normalizeHeader(cell.textContent ?? '');
+                const stripped = stripHeaderPrefix(txt);
+                return txt === needle || stripped === needle || txt.includes(needle);
+            });
+        };
+        const idxTotal = colIndex(settings.totalColumn);
+        const mealIdxs = Array.from(new Set(settings.mealColumns
+            .map((col: string) => colIndex(col))
+            .filter((i: number) => i !== -1)));
+
+        const hasConfiguredDynamicColumns = settings.totalColumn || settings.mealColumns.length > 0;
+        if (hasConfiguredDynamicColumns && (idxTotal === -1 || mealIdxs.length === 0)) {
+            console.warn('[ExportExcel] Dynamic columns were not found', {
+                configuredTotalColumn: settings.totalColumn,
+                configuredMealColumns: settings.mealColumns,
+                tableHeaders: headerCells.map(cell => normalizeHeader(cell.textContent ?? '')),
+                totalColumnIndex: idxTotal,
+                mealColumnIndexes: mealIdxs
+            });
+        }
 
         // Helper to parse numeric value (supports commas, units etc.)
         const parseNum = (str: string | any): number => {
