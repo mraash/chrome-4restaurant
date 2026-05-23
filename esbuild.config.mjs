@@ -1,4 +1,4 @@
-import { copyFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { build, context } from 'esbuild';
 
 const args = process.argv.slice(2);
@@ -18,14 +18,27 @@ const base = {
 };
 
 const staticFiles = [
-  ['src/chrome/manifest.json', 'dist/manifest.json'],
   ['src/chrome/options.html', 'dist/options.html'],
   ['src/chrome/options.css', 'dist/options.css']
 ];
 
+async function writeManifest() {
+  const [packageJson, manifestJson] = await Promise.all([
+    readFile('package.json', 'utf8'),
+    readFile('src/chrome/manifest.json', 'utf8')
+  ]);
+  const { version } = JSON.parse(packageJson);
+  const manifest = JSON.parse(manifestJson);
+
+  manifest.version = version;
+
+  await writeFile('dist/manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
 async function copyStaticFiles() {
   await mkdir('dist', { recursive: true });
   await Promise.all(staticFiles.map(([from, to]) => copyFile(from, to)));
+  await writeManifest();
 }
 
 const copyStaticFilesPlugin = {

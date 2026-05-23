@@ -1,4 +1,4 @@
-# Warehouse Menu Sorter
+# 4Restaurant helper
 
 Chrome extension for organizing 4Restaurant warehouse menu data, managing product categories, configuring export columns, and setting default download file names.
 

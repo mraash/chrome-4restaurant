@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "4Restaurant palīgs",
   "description": "Grupē un sakārto 4Restaurant produktu pieprasījumu tabulas pēc noteiktās kategorijas secības.",
-  "version": "0.1.1",
   "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
   "host_permissions": ["*://*/*", "file://*/*"],
   "background": {
