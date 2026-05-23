@@ -121,6 +121,7 @@ function switchTab(tabId: 'categories' | 'export' | 'files') {
     if (tabId !== 'categories') {
         renderCategories();
     }
+    window.scrollTo({ top: 0, left: 0 });
 }
 
 // --- Categories Logic ---
