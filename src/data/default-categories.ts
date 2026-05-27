@@ -1,0 +1,90 @@
+import type { Category } from '../shared/types';
+
+/**
+ * Default category list shipped with the extension. Sourced from the user's prior
+ * 4Restaurant project. Rules are full product names — matching is contains/substring
+ * (case-insensitive), so shorter keywords like "Bietes" can substring-match longer
+ * products like "Bietes marinētas" depending on category order. The categories below
+ * are listed in the order the user provided; reorder if you want a different
+ * fallthrough behaviour.
+ */
+export const DEFAULT_CATEGORIES: Category[] = [
+    category('augli-darzeni', 'Augļi & dārzeņi', [
+        'Apelsīni', 'Avokado', 'Āboli', 'Baklažāni', 'Banāni', 'Bietes',
+        'Bumbieri', 'Burkāni', 'Citroni', 'Cukini', 'Dilles svaigas',
+        'Gurķi lauki', 'Gurķi svaigi', 'Ingvers', 'Kabači', 'Kāposti jaunie',
+        'Kāposti skābēti', 'Kāposti svaigie', 'Kāposti ķīnas', 'Kartupeļi',
+        'Kivi', 'Kāļi', 'Ķiploki', 'Ķirbji', 'Lociņi', 'Mandarīni',
+        'Melones', 'Nektarīni', 'Paprika svaiga', 'Persiki', 'Pipari zaļie',
+        'Plūmes', 'Puravi', 'Pētersīļi svaigi', 'Redīsi baltie', 'Redīsi sarkanie',
+        'Romiešu salāti', 'Rukola', 'Salāti Lollo Biondo', 'Salāti Lollo Rosso',
+        'Salāti ledus (iceberg)', 'Šampinjoni svaigi', 'Selerijas sakne',
+        'Seleriju kāti', 'Sīpoli', 'Sīpoli sarkanie', 'Tomāti', 'Tomātu mērce',
+        'Vīnogas gaišās', 'Vīnogas tumšās', 'Zemenes',
+    ]),
+
+    category('piena-produkti', 'Piena produkti', [
+        'Biezpiens vājpiena', 'Jogurts Grieķu', 'Jogurts ar augļu piedevām',
+        'Jogurts bezpiedevu', 'Kefīrs', 'Krējums', 'Krējums saldais',
+        'Krēmsiers Baltais', 'Piens', 'Siers', 'Siers CIETAIS', 'Siers Fetas',
+        'Siers Mocarella mini', 'Siers Rīvēts', 'Svagais siers bez piedevām', 'Sviests',
+    ]),
+
+    category('maize', 'Maize', [
+        'Baltmaize', 'Kliju maize', 'Maize rudzu ar graudiem', 'Rudzu maize', 'Saldskābā maize',
+    ]),
+
+    category('gala-zivs', 'Gaļa & zivs', [
+        'Cāļu aknas', 'Cāļu šķiņķi atkauloti svaigi', 'Cāļu šķiņķi bez muguras svaigi',
+        'Cāļu_broileru fileja', 'Cīsiņi', 'Cūkgaļas fileja', 'Cūkgaļas kakla karbonāde',
+        'Cūkgaļas karbonāde bez kaula', 'Cūkgaļas kotlešu gaļa', 'Cūkgaļas krūt.',
+        'Cūkgaļas krūt.ar kaulu', 'Cūkgaļas lāpstiņa', 'Cūku  mēles', 'Desa vārīta',
+        'Desiņas mednieku', 'Heka fileja', 'Krabju nūjiņas', 'Krūtiņa kūpināta',
+        'Kūpināts cūkgaļas šķiņķis', 'Laša fileja', 'Liellopa kakla karbonāde',
+        'Liellopa kotlešu gaļa', 'Saidas fileja', 'Siļķu fileja', 'Vistas filejas gabaliņi',
+        'Vistas kotlešu gaļa', 'Vistas šķiņķi SALDĒTI', 'Vistu aknas SALDETAS', 'Vistu aknas svaigas',
+    ]),
+
+    category('sasaldetie-produkti', 'Sasaldētie produkti', [
+        'Saldēta paprika strēmelītēs', 'Saldētas dilles', 'Saldētas dzērvenes',
+        'Saldētas jāņogas', 'Saldētas pupiņas pākšu zaļas', 'Saldētas sviesta pupiņas dzeltenās',
+        'Saldētas upenes', 'Saldētas zemenes', 'Saldēti baby burkāni', 'Saldēti brokoļi',
+        'Saldēti burkāni kubiņos', 'Saldēti burkāni-zirnīši', 'Saldēti cukini',
+        'Saldēti puķkāposti', 'Saldēti pētersīļi', 'Saldēti rabarberi', 'Saldēti zirņi',
+        'Saldēti ķirši', 'Saldēti šampinjoni', 'Saldēts dārzeņu maisījums',
+        'Saldēts meksikāņu maisījums',
+    ]),
+
+    category('bakaleja', 'Bakaleja', [
+        'Auzu pārslas', 'Bietes marinētas', 'Bulgurs', 'Cepamais pulveris Soda', 'Cukurs',
+        'Četru graudu pārslas', 'Eļļa rapšu/saulespuķu', 'Griķi', 'Grūbas',
+        'Gurķi konservēti', 'Ievārījums', 'Kafija malta TCHIBO, MERILD, JACOBS', 'Kakao',
+        'Kokosriekstu skaidiņas', 'Kompots ananāsu', 'Kompots persiku',
+        'Krējums saldais Milac Gold', 'Kukurūza konservēta', 'Kus kus', 'Ķirbju sēklas',
+        'Lēcas sarkanas', 'Majonēze', 'Makaroni', 'Makaroni pilngraudu (spirāles, radziņi)',
+        'Makaroni radziņi, nūdeles', 'Manna', 'Margarīns',
+        'Marinēt šampinjoni ROLNIK, 1.7 kg', 'Medus', 'Miežu putraimi', 'Milti',
+        'Milti kartupeļu', 'Mārrutki', 'Mērce sojas', 'Mērce worcesteshire', 'Mērce čilli',
+        'Olīvas melnās', 'Olīveļļa', 'Paprika  marinēta ( kafe)', 'Piecu graudu pārslas',
+        'Prosa', 'Pupiņas baltas', 'Pupiņas konservētas', 'Putraimi kukurūzas', 'Raugs',
+        'Rozīnes', 'Rīsi gargraudu', 'Rīsi parboiled', 'Saulespuķu sēklas', 'Sezama sēklas',
+        'Skābenes konservētas', 'Soda dzeramā', 'Skumbrija s/s', 'Tomāti s/s mizoti',
+        'Tomātu pasta', 'Tuncis gabaliņos s/s', 'Trīs graudu pārslas', 'Tēja kg',
+        'Vaniļas  cukurs', 'Zemesrieksti lobīti', 'Zirņi konservēti', 'Zirņi pelēkie',
+        'Zirņi šķeltie', 'Žāvētu augļu maisījums, rieksti, rozīnes',
+        'Citronskābe', 'Etiķis galda 9%', 'Garšviela universālā', 'Kanēlis malts',
+        'Karijs', 'Krustnagliņas', 'Kurkuma, estragons', 'Ķimenes', 'Lauru lapas',
+        'Pipari melnie malti', 'Piparmētras', 'Sinepes Angļu', 'Sarkanās paprikas pulveris',
+        'Sāls', 'Vaniļas cukurs', 'Želatīns',
+        'Olas',
+        'Rīvmaize', 'Rudzu rīvmaize',
+    ]),
+
+    category('citi', 'Citi', [
+        'Ūdens',
+    ]),
+];
+
+function category(id: string, name: string, keywords: string[]): Category {
+    return { id, name, rules: keywords.map(keyword => ({ keyword })) };
+}

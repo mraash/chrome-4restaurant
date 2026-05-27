@@ -1,20 +1,27 @@
 {
-  "name": "4restaurant-helper",
+  "name": "chrome-4restaurant",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
+  "description": "Chrome extension helper for the 4Restaurant restaurant management system.",
   "scripts": {
-    "dev": "node esbuild.config.mjs --watch",
-    "build": "node esbuild.config.mjs --prod",
-    "version": "npm run build"
+    "dev": "node build.mjs --watch",
+    "build": "tsc --noEmit && node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "version": "node scripts/bump-manifest.mjs && git add src/chrome/manifest.json"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.269",
-    "@types/node": "^22.15.29",
-    "@types/xlsx": "^0.0.36",
-    "esbuild": "^0.22.0",
-    "typescript": "^5.5.0"
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/chrome": "^0.0.268",
+    "esbuild": "^0.21.4",
+    "eslint": "^10.4.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.60.0"
   },
   "dependencies": {
-    "xlsx-js-style": "^1.2.0"
+    "exceljs": "^4.4.0"
   }
 }

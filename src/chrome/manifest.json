@@ -1,22 +1,32 @@
 {
-  "manifest_version": 3,
-  "name": "4Restaurant palīgs",
-  "description": "Grupē un sakārto 4Restaurant produktu pieprasījumu tabulas pēc noteiktās kategorijas secības.",
-  "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
-  "host_permissions": ["*://*/*", "file://*/*"],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end"
+    "manifest_version": 3,
+    "name": "4Restaurant",
+    "version": "1.0.0",
+    "description": "Helper extension for the 4Restaurant restaurant management system.",
+    "permissions": [
+        "contextMenus",
+        "storage",
+        "scripting"
+    ],
+    "host_permissions": [
+        "file:///*"
+    ],
+    "background": {
+        "service_worker": "service-worker.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "file:///*"
+            ],
+            "js": [
+                "content-script.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "options_page": "options.html",
+    "action": {
+        "default_title": "4Restaurant"
     }
-  ]
 }
