@@ -7,28 +7,7 @@
   <link rel="stylesheet" href="./options.css">
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true"></div>
-        <div class="brand-name">4Restaurant</div>
-      </div>
-      <nav class="tabs" role="tablist">
-        <button class="tab active" role="tab" data-tab="categories" aria-selected="true">Kategorijas</button>
-        <button class="tab" role="tab" data-tab="dynamic-columns" aria-selected="false">Dinamiskās kolonnas</button>
-        <button class="tab" role="tab" data-tab="file-names" aria-selected="false">Failu nosaukumi</button>
-      </nav>
-      <div class="sidebar-footer">
-        <span class="version" data-version></span>
-      </div>
-    </aside>
-    <main class="content">
-      <section id="tab-categories" class="panel active" role="tabpanel"></section>
-      <section id="tab-dynamic-columns" class="panel" role="tabpanel"></section>
-      <section id="tab-file-names" class="panel" role="tabpanel"></section>
-      <div class="toast" data-toast hidden></div>
-    </main>
-  </div>
+  <div id="app"></div>
   <script src="./options.js"></script>
 </body>
 </html>

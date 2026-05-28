@@ -4,11 +4,11 @@ import { argv } from 'node:process';
 
 const DIST = 'dist';
 const SRC = 'src/chrome';
-const STATIC_FILES = ['manifest.json', 'options.html', 'options.css'];
+const STATIC_FILES = ['manifest.json', 'options.html'];
 const ENTRIES = [
     `${SRC}/content-script.ts`,
     `${SRC}/service-worker.ts`,
-    `${SRC}/options.ts`,
+    `${SRC}/options.tsx`,
 ];
 
 const watch = argv.includes('--watch');
@@ -22,6 +22,8 @@ const ctx = await esbuild.context({
     outdir: DIST,
     format: 'iife',
     target: 'chrome120',
+    jsx: 'automatic',
+    jsxImportSource: 'preact',
     sourcemap: true,
     // Minify production builds to slim down content-script.js (which inlines ExcelJS).
     // Watch builds skip minification for faster rebuilds — sourcemaps cover debugging.

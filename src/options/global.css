@@ -1,0 +1,162 @@
+:root {
+  --bg: #f4f6f5;
+  --surface: #ffffff;
+  --primary: #1f7a4f;
+  --primary-hover: #186440;
+  --primary-soft: #e6f1ec;
+  --text: #1c1f1d;
+  --muted: #6b7670;
+  --border: #e3e7e5;
+  --danger: #b03030;
+  --danger-soft: #fbe9e9;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button { font-family: inherit; }
+
+h1 {
+  font-size: 22px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.lead {
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+/* --- Buttons --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+.btn-ghost:hover { background: var(--bg); }
+
+.btn-danger {
+  color: var(--danger);
+  border-color: transparent;
+  background: transparent;
+}
+.btn-danger:hover { background: var(--danger-soft); }
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* --- Input --- */
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+.input:focus {
+  outline: 2px solid var(--primary-soft);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+/* --- Utilities --- */
+
+.muted { color: var(--muted); font-size: 13px; }
+
+/* --- Shared form layout (used in DynamicColumnsTab + FileNamesTab) --- */
+
+.field-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.field-row > label {
+  font-weight: 500;
+  padding-top: 8px;
+}
+.field-hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.save-bar {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* --- Toast --- */
+
+.toast {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  padding: 12px 18px;
+  background: var(--primary);
+  color: white;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(31, 122, 79, 0.3);
+  font-size: 13px;
+  font-weight: 500;
+  animation: toast-in 200ms ease-out;
+}
+.toast.error { background: var(--danger); box-shadow: 0 6px 20px rgba(176, 48, 48, 0.3); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

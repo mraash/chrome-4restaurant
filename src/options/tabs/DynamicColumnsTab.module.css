@@ -1,0 +1,12 @@
+.mealList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mealRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.mealRow :global(.input) { flex: 1; }
